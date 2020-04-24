@@ -5,7 +5,7 @@
 #define N 100000        //試行回数の最大値
 #define LOSS_MIN 0.001  //損失の閾値
 #define LL_N 3          //LLGMNの層数
-#define DATA_N 200      //データ数
+#define DATA_N 800      //データ数
 
 //構造体
 typedef struct {

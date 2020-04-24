@@ -168,23 +168,6 @@ int main(void){
         }
     }
 
-    /*
-
-    printf("c\n");
-
-    double data[] = {1,2,3,4,5,6};
-
-    printf("a\n");
-
-    Non_linear_tranform(ll_param, data, output_x);
-
-    printf("b\n");
-
-    for(int l = 1; l <= ll_param.num_unit[1]; l++){
-        printf("%lf %lf %lf %lf %lf\n", output_x[l][1],output_x[l][2],output_x[l][3],output_x[l][4],output_x[l][5]);
-    }
-    */
-
 
     /**************************教師データ・未学習データの読み込み*****************************/
 
@@ -218,6 +201,14 @@ int main(void){
     }
     printf("\n");
     fclose(fp);
+
+
+    Non_linear_tranform(ll_param, train_data, output_x);
+
+    for (int l = 0; l < DATA_N; l++) {
+        printf("%lf %lf %lf %lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4]);
+    }
+    printf("\n");
 
     /**************************システム*****************************/
 
@@ -336,13 +327,17 @@ int main(void){
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
                 Loss_seq = Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
 
+                if (i % 100 == 0) {
+                    printf("i = %d : %lf\n", i, Loss_seq);
+                }
+
                 //重みの更新
                 update_w(ll_param, epsilon, w, t[i], layer_out[i]);
             }
             //カウント
             seq_count++;
 
-            if(seq_count % 100 == 0){
+            if(seq_count % 1 == 0){
                 printf("seq_count = %d : %lf\n", seq_count, Loss_seq);
             }
 

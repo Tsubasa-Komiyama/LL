@@ -152,7 +152,7 @@ void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
     int i,j,k, n;  //§Œä•Ï”
     int d = ll_param.input_layer_size;  //“ü—ÍƒxƒNƒgƒ‹‚ÌŸŒ³
 
-    for (n = 0; n <= DATA_N; n++) {
+    for (n = 0; n < DATA_N; n++) {
         //‘æˆê€‚Í1
         output_x[n][1] = 1;
 
