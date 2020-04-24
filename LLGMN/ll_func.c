@@ -107,24 +107,26 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
     int m = ll_param.component_num;    //コンポーネント数
     double sum_dJ_dw;   //評価関数の微分
 
-    for(n = 1; n <= batch_size; n++){
-        for(i = 1; i <= h; i++){    //i : 入力の次元のインデックス
-            for(j = 1; j <= k; j++){    //j : クラスのインデックス
-                for(l = 1; l <= m; l++){    //l : コンポーネントのインデックス
-                    sum_dJ_dw = 0.0;
+    
+    for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
+        for (j = 1; j <= k; j++) {    //j : クラスのインデックス
+            for (l = 1; l <= m; l++) {    //l : コンポーネントのインデックス
+                sum_dJ_dw = 0.0;
 
-                    if(j*l < k*m){
-                        sum_dJ_dw += (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j-1)*m + l] * layer_out[n][0][i] / layer_out[n][2][j];
 
+                if (j * l < k * m) {
+                    for (n = 0; n < batch_size; n++) {
+                        sum_dJ_dw += (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
                     }
-
-                    //更新
-                    w[i][(j-1)*m + l] -= epsilon * sum_dJ_dw;
                 }
+
+                //更新
+                w[i][(j - 1) * m + l] -= epsilon * sum_dJ_dw;
             }
         }
     }
 }
+
 
 //構造体の設定
 LL_PARAM set_param(LL_PARAM ll_param)
@@ -135,10 +137,7 @@ LL_PARAM set_param(LL_PARAM ll_param)
     }
 
     //各層の素子数
-    ll_param.num_unit[0] = 1;
-    for(int i = 1; i <= ll_param.input_layer_size; i++){
-      ll_param.num_unit[0] += i;
-    }
+    ll_param.num_unit[0] = 1 + ll_param.input_layer_size * (ll_param.input_layer_size + 3) / 2;
     ll_param.num_unit[1] = ll_param.output_layer_size * ll_param.component_num;     //K*Mk
     ll_param.num_unit[2] = ll_param.output_layer_size;                              //K
 
@@ -156,15 +155,15 @@ void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
         //第一項は1
         output_x[n][1] = 1;
 
-        /*
-        //第二項は入力ベクトルx
+        
+        //第二項～は入力ベクトルx
         for(i = 1; i <= d; i++){
-            output_x[2][i] = input_x[i];
+            output_x[n][i+1] = input_x[n][i];
         }
-        */
+        
 
         //第三項以降
-        k = 0;  //入力ベクトルXのインデックス
+        k = d;  //入力ベクトルXのインデックス
         for (i = 1; i <= d; i++) {
             j = 0;
             while (i + j <= d) {

@@ -71,7 +71,12 @@ int main(void){
         }
 
         for(j = 0; j <= ll_param.num_unit[1]; j++) {
-            w[i][j] = ((double)rand()/RAND_MAX) * 2 - 1;  //—”‚Åw‚ð‰Šú‰»
+            if (j == ll_param.num_unit[1]) {
+                w[i][j] = 0.0;
+            }
+            else {
+                w[i][j] = ((double)rand() / RAND_MAX) * 2 - 1;  //—”‚Åw‚ð‰Šú‰»
+            }
         }
     }
 
@@ -214,10 +219,10 @@ int main(void){
     Non_linear_tranform(ll_param, train_data, output_x);
 
     for (int l = 0; l < DATA_N; l++) {
-        printf("%lf %lf %lf %lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4]);
+        printf("%lf %lf %lf %lf %lf %lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4], output_x[l][5], output_x[l][6]);
     }
     printf("\n");
-    /*
+    */
 
     /**************************ƒVƒXƒeƒ€*****************************/
 
