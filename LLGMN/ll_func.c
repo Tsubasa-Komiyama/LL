@@ -50,8 +50,8 @@ void forward(LL_PARAM ll_param, double *data, double **w, double **layer_in, dou
       exp_sum += exp(layer_in[1][i]);
     }
 
-    for(i = 1; i<= k*m; i++){
-      layer_out[1][i] = exp(layer_in[1][0]) / exp_sum;
+    for(i = 1; i <= k*m; i++){
+      layer_out[1][i] = exp(layer_in[1][i]) / exp_sum;
     }
 
     /**************出力層**************/
@@ -59,7 +59,7 @@ void forward(LL_PARAM ll_param, double *data, double **w, double **layer_in, dou
     l = 0;
     for(i = 1; i <= k*m; i++){
         //コンポーネントの区切りごとに出力層の入力を初期化する
-        if(i % k == 0){
+        if(i % m == 0){
             l++;
             layer_in[2][l] = 0.0;
         }

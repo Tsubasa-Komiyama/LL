@@ -256,6 +256,10 @@ int main(void){
                 //èáì`î¿
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
                 Loss_batch += Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size) / DATA_N;
+
+                if (i % 10 == 0) {
+                    printf("i = %d : %lf\n", i, Loss_batch);
+                }
             }
 
             //èdÇ›ÇÃçXêV
@@ -327,7 +331,7 @@ int main(void){
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
                 Loss_seq = Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
 
-                if (i % 100 == 0) {
+                if (i % 1 == 0) {
                     printf("i = %d : %lf\n", i, Loss_seq);
                 }
 
