@@ -93,16 +93,16 @@ int main(void){
     }
 
     for(i = 0; i <= DATA_N; i++) {
-        if((layer_out[i] = (double**)malloc((LL_N + 1) * sizeof(double*))) == NULL) {
+        if((layer_out[i] = (double**)malloc((LL_N) * sizeof(double*))) == NULL) {
             exit(-1);
         }
 
-        for(j = 0; j <= LL_N; j++) {
-            if((layer_out[i][j] = (double*)malloc((ll_param.num_unit[i] + 1) * sizeof(double))) == NULL) {
+        for(j = 0; j < LL_N; j++) {
+            if((layer_out[i][j] = (double*)malloc((ll_param.num_unit[j] + 1) * sizeof(double))) == NULL) {
                 exit(-1);
             }
 
-            for(k = 0; k <= ll_param.num_unit[i]; k++){
+            for(k = 0; k <= ll_param.num_unit[j]; k++){
                 layer_out[i][j][k] = 0.0;
             }
         }
@@ -114,16 +114,16 @@ int main(void){
     }
 
     for(i = 0; i <= DATA_N; i++) {
-        if((layer_in[i] = (double**)malloc((LL_N + 1) * sizeof(double*))) == NULL) {
+        if((layer_in[i] = (double**)malloc((LL_N) * sizeof(double*))) == NULL) {
             exit(-1);
         }
 
-        for(j = 0; j <= LL_N; j++) {
-            if((layer_in[i][j] = (double*)malloc((ll_param.num_unit[i] + 1) * sizeof(double))) == NULL) {
+        for(j = 0; j < LL_N; j++) {
+            if((layer_in[i][j] = (double*)malloc((ll_param.num_unit[j] + 1) * sizeof(double))) == NULL) {
                 exit(-1);
             }
 
-            for(k = 0; k <= ll_param.num_unit[i]; k++){
+            for(k = 0; k <= ll_param.num_unit[j]; k++){
                 layer_in[i][j][k] = 0.0;
             }
         }
