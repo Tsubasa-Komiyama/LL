@@ -20,6 +20,7 @@ int main(void){
 
 
     /**************************層数・素子数の設定*****************************/
+    /*
     printf("コンポーネント数を入力してください：\n");
     scanf("%d", &ll_param.component_num);
 
@@ -28,7 +29,11 @@ int main(void){
 
     printf("出力層の素子数を入力してください：\n");
     scanf("%d", &ll_param.output_layer_size);
+    */
 
+    ll_param.component_num = 2;
+    ll_param.input_layer_size = 2;
+    ll_param.output_layer_size = 4;
 
     /**************************各種パラメータの設定*****************************/
     ll_param = set_param(ll_param);
@@ -77,11 +82,14 @@ int main(void){
         return -1;
     }
 
+    printf("重み\n");
+
     for(i = 0; i <= ll_param.num_unit[0]; i++) {
+        printf("w[%d] ", i);
         for(j = 0; j <= ll_param.num_unit[1]; j++) {
-            printf("w[%d][%d] = %lf\n", i, j, w[i][j]);
+            printf(" %9lf", w[i][j]);
             fprintf(fp, "%d,%d,%lf\n", i, j, w[i][j]);
-        }
+        }printf("\n");
     }
     printf("\n");
 
@@ -178,13 +186,13 @@ int main(void){
         return -1;
     }
     //データ読み込み
-    printf("教師データ\n");
+    //printf("教師データ\n");
     i = 0;
     while ((fscanf(fp, "%lf,%lf", &train_data[i][1], &train_data[i][2])) != EOF) {
-      printf("%.1lf %.1lf\n", train_data[i][1], train_data[i][2]);
+      //printf("%.1lf %.1lf\n", train_data[i][1], train_data[i][2]);
       i++;
     }
-    printf("\n");
+    //printf("\n");
     fclose(fp);
 
     //正解データ
@@ -193,22 +201,23 @@ int main(void){
         return -1;
     }
     //データ読み込み
-    printf("正解データ\n");
+    //printf("正解データ\n");
     i = 0;
     while ((fscanf(fp, "%lf,%lf,%lf,%lf", &t[i][1], &t[i][2], &t[i][3], &t[i][4])) != EOF) {
-      printf("%.1lf %.1lf %.1lf %.1lf\n", t[i][1], t[i][2], t[i][3], t[i][4]);
+      //printf("%.1lf %.1lf %.1lf %.1lf\n", t[i][1], t[i][2], t[i][3], t[i][4]);
       i++;
     }
-    printf("\n");
+    //printf("\n");
     fclose(fp);
 
-
+    /*
     Non_linear_tranform(ll_param, train_data, output_x);
 
     for (int l = 0; l < DATA_N; l++) {
         printf("%lf %lf %lf %lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4]);
     }
     printf("\n");
+    /*
 
     /**************************システム*****************************/
 
@@ -257,9 +266,11 @@ int main(void){
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
                 Loss_batch += Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size) / DATA_N;
 
+                /*
                 if (i % 10 == 0) {
                     printf("i = %d : %lf\n", i, Loss_batch);
                 }
+                */
             }
 
             //重みの更新
@@ -268,7 +279,7 @@ int main(void){
             //カウント
             batch_count++;
 
-            if(batch_count % 500 == 0){
+            if(batch_count % 1 == 0){
                 printf("batch_count = %d : %lf\n", batch_count, Loss_batch);
             }
             fprintf(fp, "%d,%lf\n", batch_count, Loss_batch);
