@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#pragma warning(disable : 4996)
 
 
 //評価関数
@@ -105,7 +106,15 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
     int h = ll_param.num_unit[0];
     int k = ll_param.output_layer_size;   //クラス数
     int m = ll_param.component_num;    //コンポーネント数
-    double sum_dJ_dw;   //評価関数の微分
+    double sum_dJ_dw;   //評価関数の微分の総和
+    double dJ_dw;       //評価関数の微分
+    FILE *fp;
+
+    fp = fopen("dJ_dw_batch.csv", "w");
+    if (fp == NULL) {
+        printf("ファイルが開けません\n");
+        exit(EXIT_FAILURE);
+    }
 
     
     for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
@@ -114,9 +123,11 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
                 sum_dJ_dw = 0.0;
 
 
-                if (j * l < k * m) {
+                if (((j - 1) * m + l) != (k * m+1)) {
                     for (n = 0; n < batch_size; n++) {
-                        sum_dJ_dw += (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
+                        dJ_dw = (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
+                        sum_dJ_dw += dJ_dw;
+                        fprintf(fp, "%d,%d,%d,%d,%lf\n", i, j, l, n, dJ_dw);
                     }
                 }
 
@@ -125,6 +136,10 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
             }
         }
     }
+
+    fclose(fp);
+
+    i = 0;
 }
 
 

@@ -108,7 +108,24 @@ LL_PARAM set_param(LL_PARAM ll_param);
 
 */
 
-void Non_linear_tranform(LL_PARAM ll_param, double* input_x, double** output_x);
+void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x);
+
+/*!----------------------------------------------------------------------------
+ @brif ターミナルアトラクタ
+
+  ターミナルラーニング用の更新関数
+ @param [in] input_x(double*) 入力ベクトルx
+ @param [out] output_x(double*) 変換後の入力ベクトルX
+ @return なし
+ @attention
+ @par 更新履歴
+   - 2020/4/25
+     -基本的な機能の実装 (by Tsubasa Komiyama)
+
+*/
+
+void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x);
+
 
 
 
