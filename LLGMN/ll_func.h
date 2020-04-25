@@ -78,7 +78,7 @@ void update_w(LL_PARAM ll_param, double epsilon, double **w, double *t, double *
      -基本的な機能の実装 (by Tsubasa Komiyama)
 */
 
-void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, double ***layer_out, int batch_size);
+void batch_update_w(LL_PARAM ll_param, double epsilon, double** w, double** t, double*** layer_out, int batch_size, double*** layer_in);
 
 /*!----------------------------------------------------------------------------
  @brif 構造体LL_PARAMの初期化を行う関数

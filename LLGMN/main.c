@@ -282,13 +282,57 @@ int main(void){
             }
 
             //重みの更新
-            batch_update_w(ll_param, epsilon, w, t, layer_out, DATA_N);
+            batch_update_w(ll_param, epsilon, w, t, layer_out, DATA_N, layer_in);
+
+            /*
+            //更新後のパラメータを出力するファイルを開く
+            fp = fopen("w_test.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+
+            for (i = 0; i <= ll_param.num_unit[0]; i++) {
+                for (j = 0; j <= ll_param.num_unit[1]; j++) {
+                    fprintf(fp, "%d,%d,%lf\n", i, j, w[i][j]);
+                }
+            }
+
+            fclose(fp);
+
+            //layer_inを出力するファイルを開く
+            fp = fopen("in_test.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+
+            for (i = 0; i < DATA_N; i++) {
+                fprintf(fp, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", i, layer_in[i][0][1], layer_in[i][0][2], layer_in[i][0][3], layer_in[i][0][4], layer_in[i][0][5], layer_in[i][0][6], layer_in[i][1][1], layer_in[i][1][2], layer_in[i][1][3], layer_in[i][1][4], layer_in[i][1][5], layer_in[i][1][6], layer_in[i][1][7], layer_in[i][1][8], layer_in[i][2][1], layer_in[i][2][2], layer_in[i][2][3], layer_in[i][2][4]);
+            }
+
+            fclose(fp);
+
+            //layer_outを出力するファイルを開く
+            fp = fopen("out_test.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+
+            for (i = 0; i < DATA_N; i++) {
+                fprintf(fp, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", i, layer_out[i][0][1], layer_out[i][0][2], layer_out[i][0][3], layer_out[i][0][4], layer_out[i][0][5], layer_out[i][0][6], layer_out[i][1][1], layer_out[i][1][2], layer_out[i][1][3], layer_out[i][1][4], layer_out[i][1][5], layer_out[i][1][6], layer_out[i][1][7], layer_out[i][1][8], layer_out[i][2][1], layer_out[i][2][2], layer_out[i][2][3], layer_out[i][2][4]);
+            }
+
+            fclose(fp);
+            */
+
 
             //カウント
             batch_count++;
 
             if(batch_count % 1 == 0){
-                printf("batch_count = %d : %lf\n", batch_count, Loss_batch);
+                printf("batch_count = %d : %lf\n", batch_count, Loss_batch * DATA_N);
             }
             fprintf(fp, "%d,%lf\n", batch_count, Loss_batch);
         }while(fabs(Loss_batch) > LOSS_MIN && batch_count < N);
@@ -309,6 +353,7 @@ int main(void){
         }
 
         fclose(fp);
+
 
           if(fabs(Loss_batch) < LOSS_MIN){
             printf("損失の大きさが一定値を下回りました。\n");
@@ -342,10 +387,12 @@ int main(void){
             output_x[n_random] = tmp;
         }
 
+        /*
         for (int l = 0; l < DATA_N; l++) {
-            printf("%lf %lf %lf %lf %lf %lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4], output_x[l][5], output_x[l][6]);
+            printf("%9lf %9lf %9lf %9lf %9lf %9lf\n", output_x[l][1], output_x[l][2], output_x[l][3], output_x[l][4], output_x[l][5], output_x[l][6]);
         }
         printf("\n");
+        */
 
         printf("逐次学習の処理を始めます．\n");
         //損失関数を出力するファイルを開く
@@ -356,15 +403,19 @@ int main(void){
         }
         seq_count = 0;  //カウントの初期化
         do{
+            Loss_seq = 0.0;
+
             //教師データについて一つずつ順伝搬・逆伝搬・重みの更新を行う
             for(i = 0; i < DATA_N; i++){
                 //順伝搬
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
-                Loss_seq = Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
+                Loss_seq += Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
 
+                /*
                 if (i % 10 == 0) {
                     printf("i = %d : %lf\n", i, Loss_seq);
                 }
+                */
 
                 //重みの更新
                 update_w(ll_param, epsilon, w, t[i], layer_out[i]);
@@ -377,7 +428,7 @@ int main(void){
             }
 
             fprintf(fp, "%d,%lf\n", seq_count, Loss_seq);
-        }while((fabs(Loss_seq) > LOSS_MIN) && (seq_count < N));
+        }while((fabs(Loss_seq) > LOSS_MIN) && (seq_count < N * 10));
 
         fclose(fp);
 
@@ -444,10 +495,9 @@ int main(void){
         }
         
         for(i = 0; i < DATA_N; i++){
-            printf("%d :\n", i);
+            printf("%d :", i+1);
             for(j = 1; j <= ll_param.output_layer_size; j++){
-                printf(" %d: %lf", j, layer_out[i][2][j]);
-                
+                printf(" %lf", layer_out[i][2][j]);
             }
             fprintf(fp, "%d,%lf,%lf,%lf,%lf", i, layer_out[i][2][1], layer_out[i][2][2], layer_out[i][2][3], layer_out[i][2][4]);
 

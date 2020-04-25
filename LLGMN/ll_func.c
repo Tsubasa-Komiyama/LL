@@ -10,7 +10,7 @@
 //評価関数
 double Cost_Function(double *y, double *t, int size)
 {
-    double e = 0.0; //sum((y-t)^2)
+    double e = 0.0;
 
     for(int k = 1; k <= size; k++){
         e -= t[k] * log(y[k]);
@@ -60,7 +60,7 @@ void forward(LL_PARAM ll_param, double *data, double **w, double **layer_in, dou
     l = 0;
     for(i = 1; i <= k*m; i++){
         //コンポーネントの区切りごとに出力層の入力を初期化する
-        if(i % m == 0){
+        if(i % m == 1){
             l++;
             layer_in[2][l] = 0.0;
         }
@@ -87,7 +87,7 @@ void update_w(LL_PARAM ll_param, double epsilon, double **w, double *t, double *
     for(i = 1; i <= h; i++){    //i : 入力の次元のインデックス
         for(j = 1; j <= k; j++){    //j : クラスのインデックス
             for(l = 1; l <= m; l++){    //l : コンポーネントのインデックス
-                if(j*l < k*m){
+                if(((j - 1) * m + l) != (k * m)){
                     //微分値の計算
                     dJ_dw = (layer_out[2][j] - t[j]) * layer_out[1][(j-1)*m + l] * layer_out[0][i] / layer_out[2][j];
                 }
@@ -100,7 +100,7 @@ void update_w(LL_PARAM ll_param, double epsilon, double **w, double *t, double *
 }
 
 
-void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, double ***layer_out, int batch_size)
+void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, double ***layer_out, int batch_size, double ***layer_in)
 {
     int i, j, l, n;     //制御変数
     int h = ll_param.num_unit[0];
@@ -123,7 +123,7 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
                 sum_dJ_dw = 0.0;
 
 
-                if (((j - 1) * m + l) != (k * m+1)) {
+                if (((j - 1) * m + l) != (k * m)) {
                     for (n = 0; n < batch_size; n++) {
                         dJ_dw = (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
                         sum_dJ_dw += dJ_dw;
