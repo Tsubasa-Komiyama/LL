@@ -19,26 +19,27 @@ int main(void){
     int seq_count;      //逐次学習回数
     double beta;        //TAの定数
     int tf;             //TAの学習回数
+    double sampling_time; //サンプリング時間
     double J0;          //評価関数の初期値
     int n_random;                   //入力ベクトルのシャッフルに使用
     double* tmp = NULL;             //入力ベクトルのシャッフルに使用
 
 
     /**************************層数・素子数の設定*****************************/
-    /*
+    
     printf("コンポーネント数を入力してください：\n");
     scanf("%d", &ll_param.component_num);
 
-    printf("入力層の層数を入力してください：\n");
+    printf("入力次元数を入力してください：\n");
     scanf("%d", &ll_param.input_layer_size);
 
-    printf("出力層の素子数を入力してください：\n");
+    printf("クラス数を入力してください：\n");
     scanf("%d", &ll_param.output_layer_size);
-    */
+    
 
-    ll_param.component_num = 2;
-    ll_param.input_layer_size = 2;
-    ll_param.output_layer_size = 4;
+    //ll_param.component_num = 2;
+    //ll_param.input_layer_size = 2;
+    //ll_param.output_layer_size = 4;
 
     /**************************各種パラメータの設定*****************************/
     ll_param = set_param(ll_param);
@@ -295,7 +296,7 @@ int main(void){
             }
 
             //重みの更新
-            batch_update_w(ll_param, epsilon, w, t, layer_out, DATA_N, layer_in);
+            batch_update_w(ll_param, epsilon, w, t, layer_out, DATA_N);
 
             /*
             //更新後のパラメータを出力するファイルを開く
@@ -487,6 +488,9 @@ int main(void){
 
             printf("TAの学習回数tfを入力してください：\n");
             scanf("%d", &tf);
+
+            printf("TAのサンプリング時間を入力してください：\n");
+            scanf("%lf", &sampling_time);
             printf("**************************************************\n");
 
             //教師データの非線形変換
@@ -521,12 +525,12 @@ int main(void){
                 }
 
                 //重みの更新
-                TA_batch_update_w(ll_param, w, t, layer_out, J0, beta, tf, J, DATA_N);
+                TA_batch_update_w(ll_param, w, t, layer_out, J0, beta, tf, sampling_time, J, DATA_N);
 
                 //カウント
                 batch_count++;
 
-                if (batch_count % 100 == 0) {
+                if (batch_count % 1 == 0) {
                     printf("batch_count = %d : %lf\n", batch_count, Loss_batch);
                 }
                 fprintf(fp, "%d,%lf\n", batch_count, Loss_batch);
@@ -576,6 +580,9 @@ int main(void){
 
             printf("TAの学習回数tfを入力してください：\n");
             scanf("%d", &tf);
+
+            printf("TAのサンプリング時間を入力してください：\n");
+            scanf("%lf", &sampling_time);
             printf("**************************************************\n");
 
             //教師データの非線形変換
@@ -618,7 +625,7 @@ int main(void){
                     */
 
                     //重みの更新
-                    TA_update_w(ll_param, w, t[i], layer_out[i], J0, beta, tf, J[i]);
+                    TA_update_w(ll_param, w, t[i], layer_out[i], J0, beta, tf, J[i], sampling_time);
                 }
                 //カウント
                 seq_count++;

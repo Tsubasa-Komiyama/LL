@@ -100,7 +100,7 @@ void update_w(LL_PARAM ll_param, double epsilon, double **w, double *t, double *
 }
 
 
-void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, double ***layer_out, int batch_size, double ***layer_in)
+void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, double ***layer_out, int batch_size)
 {
     int i, j, l, n;     //制御変数
     int h = ll_param.num_unit[0];
@@ -194,7 +194,7 @@ void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
 
 
 //ターミナルラーニング
-void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J)
+void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J, double delta_t)
 {
     int i, j, l;     //制御変数
     int h = ll_param.num_unit[0];
@@ -219,14 +219,14 @@ void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, d
                 }
 
                 //更新
-                w[i][(j - 1) * m + l] -= eta * gamma * dJ_dw;
+                w[i][(j - 1) * m + l] -= (delta_t / 2) * eta * gamma * dJ_dw;
             }
         }
     }
 }
 
 
-void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double *J, int batch_size)
+void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double delta_t, double *J, int batch_size)
 {
     int i, j, l, n;     //制御変数
     int h = ll_param.num_unit[0];
@@ -262,7 +262,7 @@ void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** laye
                 }
 
                 //更新
-                w[i][(j - 1) * m + l] -= eta * gamma * dJ_dw;
+                w[i][(j - 1) * m + l] -= (delta_t / 2 ) * eta * gamma * dJ_dw;
             }
         }
     }
