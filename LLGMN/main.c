@@ -272,7 +272,7 @@ int main(void){
             for(i = 0; i < DATA_N; i++){
                 //‡“`”À
                 forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
-                Loss_batch += Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size) / DATA_N;
+                Loss_batch += Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
 
                 /*
                 if (i % 10 == 0) {
@@ -331,8 +331,8 @@ int main(void){
             //ƒJƒEƒ“ƒg
             batch_count++;
 
-            if(batch_count % 1 == 0){
-                printf("batch_count = %d : %lf\n", batch_count, Loss_batch * DATA_N);
+            if(batch_count % 100 == 0){
+                printf("batch_count = %d : %lf\n", batch_count, Loss_batch);
             }
             fprintf(fp, "%d,%lf\n", batch_count, Loss_batch);
         }while(fabs(Loss_batch) > LOSS_MIN && batch_count < N);
@@ -428,7 +428,7 @@ int main(void){
             }
 
             fprintf(fp, "%d,%lf\n", seq_count, Loss_seq);
-        }while((fabs(Loss_seq) > LOSS_MIN) && (seq_count < N * 10));
+        }while((fabs(Loss_seq) > LOSS_MIN) && (seq_count < N));
 
         fclose(fp);
 

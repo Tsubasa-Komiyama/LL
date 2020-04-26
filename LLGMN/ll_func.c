@@ -110,11 +110,13 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
     double dJ_dw;       //評価関数の微分
     FILE *fp;
 
+    /*
     fp = fopen("dJ_dw_batch.csv", "w");
     if (fp == NULL) {
         printf("ファイルが開けません\n");
         exit(EXIT_FAILURE);
     }
+    */
 
     
     for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
@@ -127,7 +129,7 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
                     for (n = 0; n < batch_size; n++) {
                         dJ_dw = (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
                         sum_dJ_dw += dJ_dw;
-                        fprintf(fp, "%d,%d,%d,%d,%lf\n", i, j, l, n, dJ_dw);
+                        //fprintf(fp, "%d,%d,%d,%d,%lf\n", i, j, l, n, dJ_dw);
                     }
                 }
 
@@ -137,7 +139,7 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
         }
     }
 
-    fclose(fp);
+    //fclose(fp);
 
     i = 0;
 }
