@@ -108,7 +108,7 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
     int m = ll_param.component_num;    //コンポーネント数
     double sum_dJ_dw;   //評価関数の微分の総和
     double dJ_dw;       //評価関数の微分
-    FILE *fp;
+    //FILE *fp;
 
     /*
     fp = fopen("dJ_dw_batch.csv", "w");
@@ -123,7 +123,6 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
         for (j = 1; j <= k; j++) {    //j : クラスのインデックス
             for (l = 1; l <= m; l++) {    //l : コンポーネントのインデックス
                 sum_dJ_dw = 0.0;
-
 
                 if (((j - 1) * m + l) != (k * m)) {
                     for (n = 0; n < batch_size; n++) {
@@ -188,6 +187,82 @@ void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
                 //printf("output_x[%d][1] = input_x[%d] * input_x[%d] = %lf\n", k+3,i,j+i,output_x[k+3][1]);
                 j++;
                 k++;
+            }
+        }
+    }
+}
+
+
+//ターミナルラーニング
+void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J)
+{
+    int i, j, l;     //制御変数
+    int h = ll_param.num_unit[0];
+    int k = ll_param.output_layer_size;   //クラス数
+    int m = ll_param.component_num;    //コンポーネント数
+    double dJ_dw = 0.0;   //評価関数の微分
+    double eta;
+    double gamma = 0.0;
+
+    //学習率etaの計算
+    eta = pow(J0, 1 - beta) / (tf * (1 - beta));
+
+    for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
+        for (j = 1; j <= k; j++) {    //j : クラスのインデックス
+            for (l = 1; l <= m; l++) {    //l : コンポーネントのインデックス
+                if (((j - 1) * m + l) != (k * m)) {
+                    //微分値の計算
+                    dJ_dw = (layer_out[2][j] - t[j]) * layer_out[1][(j - 1) * m + l] * layer_out[0][i] / layer_out[2][j];
+
+                    //gammaの計算
+                    gamma = pow(J, beta) / pow(dJ_dw, 2.0);
+                }
+
+                //更新
+                w[i][(j - 1) * m + l] -= eta * gamma * dJ_dw;
+            }
+        }
+    }
+}
+
+
+void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double *J, int batch_size)
+{
+    int i, j, l, n;     //制御変数
+    int h = ll_param.num_unit[0];
+    int k = ll_param.output_layer_size;   //クラス数
+    int m = ll_param.component_num;    //コンポーネント数
+    double dJ_dw = 0.0;   //評価関数の微分
+    double sum_dJ_dw;
+    double eta;
+    double gamma = 0.0;
+    double sum_J;
+
+    //学習率etaの計算
+    eta = pow(J0, 1 - beta) / (tf * (1 - beta));
+
+    for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
+        for (j = 1; j <= k; j++) {    //j : クラスのインデックス
+            for (l = 1; l <= m; l++) {    //l : コンポーネントのインデックス
+                sum_dJ_dw = 0.0;
+                sum_J = 0.0;
+                gamma = 0.0;
+
+                if (((j - 1) * m + l) != (k * m)) {
+                    for (n = 0; n < batch_size; n++) {
+                        //微分値の計算
+                        dJ_dw = (layer_out[n][2][j] - t[n][j]) * layer_out[n][1][(j - 1) * m + l] * layer_out[n][0][i] / layer_out[n][2][j];
+                        sum_dJ_dw += dJ_dw;
+                        sum_J += J[n];
+                    }
+                    
+                    
+                    //gammaの計算
+                    gamma = pow(sum_J, beta) / pow(sum_dJ_dw, 2.0);
+                }
+
+                //更新
+                w[i][(j - 1) * m + l] -= eta * gamma * dJ_dw;
             }
         }
     }

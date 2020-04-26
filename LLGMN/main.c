@@ -17,6 +17,11 @@ int main(void){
     double epsilon;     //学習率
     int batch_count;    //一括学習回数
     int seq_count;      //逐次学習回数
+    double beta;        //TAの定数
+    int tf;             //TAの学習回数
+    double J0;          //評価関数の初期値
+    int n_random;                   //入力ベクトルのシャッフルに使用
+    double* tmp = NULL;             //入力ベクトルのシャッフルに使用
 
 
     /**************************層数・素子数の設定*****************************/
@@ -45,9 +50,8 @@ int main(void){
     double **t = NULL;              //正解データ
     double **unlearn_data;          //未学習データ
     double **output_x = NULL;       //非線形変換後の入力ベクトル
+    double *J = NULL;
 
-    int n_random;                   //入力ベクトルのシャッフルに使用
-    double* tmp = NULL;             //入力ベクトルのシャッフルに使用
 
     //train_data
     if((train_data = (double**)malloc((DATA_N + 1) * sizeof(double*))) == NULL) {
@@ -184,6 +188,11 @@ int main(void){
         }
     }
 
+    //J
+    if ((J = (double*)malloc((DATA_N + 1) * sizeof(double))) == NULL) {
+        exit(-1);
+    }
+
 
     /**************************教師データ・未学習データの読み込み*****************************/
 
@@ -239,8 +248,10 @@ int main(void){
 
       printf("[a] 一括更新学習法\n");
       printf("[b] 逐次更新学習法\n");
-      printf("[c] 学習済みニューロンのテスト\n");
-      printf("[d] パラメータのリセット\n");
+      printf("[c] TAを用いた一括更新学習法\n");
+      printf("[d] TAを用いた逐次更新学習法\n");
+      printf("[e] 学習済みニューロンのテスト\n");
+      printf("[f] パラメータのリセット\n");
       printf("[ESC] プログラム終了\n");
 
       printf("**************************************************\n");
@@ -249,6 +260,8 @@ int main(void){
       printf("**************************************************\n");
 
       switch (key) {
+
+        /***************************************************************************************************************************************/
         case 'a':
         /**************************一括学習*************************************/
         printf("学習率を入力してください：\n");
@@ -370,6 +383,8 @@ int main(void){
           printf("**************************************************\n");
           break;
 
+
+        /***************************************************************************************************************************************/
         case 'b':
         /**************************逐次学習*************************************/
         printf("学習率を入力してください：\n");
@@ -462,7 +477,196 @@ int main(void){
           printf("**************************************************\n");
           break;
 
+
+
+        /***************************************************************************************************************************************/
         case 'c':
+            /**************************TAの一括学習*************************************/
+            printf("TAの定数beta（０～１）を入力してください：\n");
+            scanf("%lf", &beta);
+
+            printf("TAの学習回数tfを入力してください：\n");
+            scanf("%d", &tf);
+            printf("**************************************************\n");
+
+            //教師データの非線形変換
+            Non_linear_tranform(ll_param, train_data, output_x);
+
+            printf("TAを用いた一括学習の処理を始めます．\n");
+            //損失を格納するファイルを開く
+            fp = fopen("loss_batch.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+            batch_count = 0;    //カウントの初期化
+            do {
+                //教師データについて一つずつ順伝搬・逆伝搬を行い，重みの更新はエポックごとに行う
+                Loss_batch = 0.0;
+                for (i = 0; i < DATA_N; i++) {
+                    //順伝搬
+                    forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
+                    J[i] = Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
+                    Loss_batch += J[i];
+
+                    /*
+                    if (i % 10 == 0) {
+                        printf("i = %d : %lf\n", i, Loss_batch);
+                    }
+                    */
+                }
+
+                if (batch_count == 0) {
+                    J0 = Loss_batch;
+                }
+
+                //重みの更新
+                TA_batch_update_w(ll_param, w, t, layer_out, J0, beta, tf, J, DATA_N);
+
+                //カウント
+                batch_count++;
+
+                if (batch_count % 100 == 0) {
+                    printf("batch_count = %d : %lf\n", batch_count, Loss_batch);
+                }
+                fprintf(fp, "%d,%lf\n", batch_count, Loss_batch);
+            } while (fabs(Loss_batch) > LOSS_MIN && batch_count < N);
+
+            fclose(fp);
+
+            //学習後のパラメータを出力するファイルを開く
+            fp = fopen("w_batch.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+
+            for (i = 0; i <= ll_param.num_unit[0]; i++) {
+                for (j = 0; j <= ll_param.num_unit[1]; j++) {
+                    fprintf(fp, "%d,%d,%lf\n", i, j, w[i][j]);
+                }
+            }
+
+            fclose(fp);
+
+
+            if (fabs(Loss_batch) < LOSS_MIN) {
+                printf("損失の大きさが一定値を下回りました。\n");
+                printf("損失の大きさ : %lf\n", Loss_batch);
+                printf("繰り返し回数は%d\n", batch_count);
+            }
+            else if (batch_count >= N) {
+                printf("繰り返し回数が一定数を超えました。\n");
+                printf("損失の大きさ : %lf\n", Loss_batch);
+                printf("繰り返し回数は%d\n", batch_count);
+            }
+            else {
+                printf("損失の大きさ : %lf\n", Loss_batch);
+                printf("繰り返し回数は%d\n", batch_count);
+            }
+            printf("**************************************************\n");
+            break;
+
+
+        /***************************************************************************************************************************************/
+        case 'd':
+            /**************************TAの一括学習*************************************/
+            printf("TAの定数beta（０～１）を入力してください：\n");
+            scanf("%lf", &beta);
+
+            printf("TAの学習回数tfを入力してください：\n");
+            scanf("%d", &tf);
+            printf("**************************************************\n");
+
+            //教師データの非線形変換
+            Non_linear_tranform(ll_param, train_data, output_x);
+
+            //教師データをシャッフルする
+            for (i = 0; i < DATA_N; i++) {
+                n_random = rand() % DATA_N;
+                tmp = output_x[i];
+                output_x[i] = output_x[n_random];
+                output_x[n_random] = tmp;
+            }
+
+            printf("TAの逐次学習の処理を始めます．\n");
+            //損失関数を出力するファイルを開く
+            fp = fopen("loss_seq.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+            seq_count = 0;  //カウントの初期化
+            do {
+                Loss_seq = 0.0;
+
+                //教師データについて一つずつ順伝搬・逆伝搬・重みの更新を行う
+                for (i = 0; i < DATA_N; i++) {
+                    //順伝搬
+                    forward(ll_param, output_x[i], w, layer_in[i], layer_out[i]);
+                    J[i] = Cost_Function(layer_out[i][2], t[i], ll_param.output_layer_size);
+                    Loss_seq += J[i];
+
+                    if (seq_count == 0 && i == 0) {
+                        J0 = J[i];
+                    }
+
+                    /*
+                    if (i % 10 == 0) {
+                        printf("i = %d : %lf\n", i, Loss_seq);
+                    }
+                    */
+
+                    //重みの更新
+                    TA_update_w(ll_param, w, t[i], layer_out[i], J0, beta, tf, J[i]);
+                }
+                //カウント
+                seq_count++;
+
+                if (seq_count % 100 == 0) {
+                    printf("seq_count = %d : %lf\n", seq_count, Loss_seq);
+                }
+
+                fprintf(fp, "%d,%lf\n", seq_count, Loss_seq);
+            } while ((fabs(Loss_seq) > LOSS_MIN) && (seq_count < N));
+
+            fclose(fp);
+
+            //学習後のパラメータを出力するファイルを開く
+            fp = fopen("w_seq.csv", "w");
+            if (fp == NULL) {
+                printf("ファイルが開けません\n");
+                return -1;
+            }
+
+            for (i = 0; i <= ll_param.num_unit[0]; i++) {
+                for (j = 0; j <= ll_param.num_unit[1]; j++) {
+                    fprintf(fp, "%d,%d,%lf\n", i, j, w[i][j]);
+                }
+            }
+
+            fclose(fp);
+
+            if (fabs(Loss_seq) < LOSS_MIN) {
+                printf("損失の大きさが一定値を下回りました。\n");
+                printf("損失の大きさ : %lf\n", Loss_seq);
+                printf("繰り返し回数は%d\n", seq_count);
+            }
+            else if (seq_count > N) {
+                printf("繰り返し回数が一定数を超えました。\n");
+                printf("損失の大きさ : %lf\n", Loss_seq);
+                printf("繰り返し回数は%d\n", seq_count);
+            }
+            else {
+                printf("損失の大きさ : %lf\n", Loss_seq);
+                printf("繰り返し回数は%d\n", seq_count);
+            }
+            printf("**************************************************\n");
+            break;
+
+
+        /***************************************************************************************************************************************/
+        case 'e':
         //未学習データ
         //ファイルオープン
     	if ((fp = fopen("dis_sig.csv", "r")) == NULL) {
@@ -509,7 +713,9 @@ int main(void){
          printf("**************************************************\n");
          break;
 
-        case 'd':
+
+        /***************************************************************************************************************************************/
+        case 'f':
             printf("パラメータ（重み，バイアス）をリセットします\n\n");
 
             srand((unsigned int)time(NULL));
@@ -592,7 +798,7 @@ int main(void){
     }
     free(output_x);
     free(ll_param.num_unit);
-
+    free(J);
 
 
     return 0;

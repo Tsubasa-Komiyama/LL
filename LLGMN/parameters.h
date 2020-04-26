@@ -23,5 +23,6 @@ double ***layer_out;         //各層の出力
 double **t;                  //正解データ
 double **unlearn_data;      //未学習データ
 double **output_x;          //非線形変換後の入力ベクトル
+double* J;                  //評価関数
 
 #endif

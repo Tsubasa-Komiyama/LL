@@ -111,9 +111,9 @@ LL_PARAM set_param(LL_PARAM ll_param);
 void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x);
 
 /*!----------------------------------------------------------------------------
- @brif ターミナルアトラクタ
+ @brif 逐次学習用ターミナルアトラクタ
 
-  ターミナルラーニング用の更新関数
+  逐次学習におけるターミナルラーニング用の更新関数
  @param [in] input_x(double*) 入力ベクトルx
  @param [out] output_x(double*) 変換後の入力ベクトルX
  @return なし
@@ -124,8 +124,23 @@ void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x)
 
 */
 
-void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x);
+void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J);
 
+/*!----------------------------------------------------------------------------
+ @brif 一括学習用ターミナルアトラクタ
+
+  一括学習におけるターミナルラーニング用の更新関数
+ @param [in] input_x(double*) 入力ベクトルx
+ @param [out] output_x(double*) 変換後の入力ベクトルX
+ @return なし
+ @attention
+ @par 更新履歴
+   - 2020/4/25
+     -基本的な機能の実装 (by Tsubasa Komiyama)
+
+*/
+
+void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double* J, int batch_size);
 
 
 
