@@ -23,10 +23,11 @@ int main(void){
     double J0;          //評価関数の初期値
     int n_random;                   //入力ベクトルのシャッフルに使用
     double* tmp = NULL;             //入力ベクトルのシャッフルに使用
+    double correct_rate;            //正解率
 
 
     /**************************層数・素子数の設定*****************************/
-    
+
     printf("コンポーネント数を入力してください：\n");
     scanf("%d", &ll_param.component_num);
 
@@ -35,7 +36,7 @@ int main(void){
 
     printf("クラス数を入力してください：\n");
     scanf("%d", &ll_param.output_layer_size);
-    
+
 
     //ll_param.component_num = 2;
     //ll_param.input_layer_size = 2;
@@ -52,6 +53,7 @@ int main(void){
     double **unlearn_data;          //未学習データ
     double **output_x = NULL;       //非線形変換後の入力ベクトル
     double *J = NULL;
+    double** dis_t = NULL;
 
 
     //train_data
@@ -167,6 +169,23 @@ int main(void){
         }
     }
 
+    //dis_tt
+    if ((dis_t = (double**)malloc((DATA_N + 1) * sizeof(double*))) == NULL) {
+        exit(-1);
+    }
+
+    for (i = 0; i <= DATA_N; i++) {
+        if ((dis_t[i] = (double*)malloc((ll_param.output_layer_size + 1) * sizeof(double))) == NULL) {
+            exit(-1);
+        }
+    }
+
+    for (i = 0; i <= DATA_N; i++) {
+        for (j = 0; j <= ll_param.output_layer_size; j++) {
+            dis_t[i][j] = 0.0;
+        }
+    }
+
     //unlearn_data
     if((unlearn_data = (double**)malloc((DATA_N + 1) * sizeof(double*))) == NULL) {
         exit(-1);
@@ -195,7 +214,7 @@ int main(void){
     }
 
 
-    /**************************教師データ・未学習データの読み込み*****************************/
+    /**************************教師データ・正解データの読み込み*****************************/
 
     //教師データ
     //ファイルオープン
@@ -690,6 +709,21 @@ int main(void){
         //printf("\n");
         fclose(fp);
 
+        //正解データ
+        if ((fp = fopen("lea_T_sig.csv", "r")) == NULL) {
+            printf("ファイルを開けませんでした．\n");
+            return -1;
+        }
+        //データ読み込み
+        //printf("正解データ\n");
+        i = 0;
+        while ((fscanf(fp, "%lf,%lf,%lf,%lf", &dis_t[i][1], &dis_t[i][2], &dis_t[i][3], &dis_t[i][4])) != EOF) {
+            //printf("%.1lf %.1lf %.1lf %.1lf\n", dis_t[i][1], dis_t[i][2], dis_t[i][3], dis_t[i][4]);
+            i++;
+        }
+        //printf("\n");
+        fclose(fp);
+
         Non_linear_tranform(ll_param, unlearn_data, output_x);
 
         for(i = 0; i < DATA_N; i++){
@@ -704,18 +738,24 @@ int main(void){
             printf("ファイルが開けません\n");
             return -1;
         }
-        
+
         for(i = 0; i < DATA_N; i++){
             printf("%d :", i+1);
             for(j = 1; j <= ll_param.output_layer_size; j++){
                 printf(" %lf", layer_out[i][2][j]);
             }
-            fprintf(fp, "%d,%lf,%lf,%lf,%lf", i, layer_out[i][2][1], layer_out[i][2][2], layer_out[i][2][3], layer_out[i][2][4]);
+            fprintf(fp, "%d,%lf,%lf,%lf,%lf\n", i, layer_out[i][2][1], layer_out[i][2][2], layer_out[i][2][3], layer_out[i][2][4]);
 
             printf("\n");
         }
 
         fclose(fp);
+
+        printf("\n");
+
+        printf("正解率は：");
+        correct_rate = Accuracy(ll_param, layer_out, dis_t, DATA_N);
+        printf("%lf\n", correct_rate);
 
          printf("**************************************************\n");
          break;

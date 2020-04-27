@@ -159,5 +159,21 @@ void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, d
 void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double delta_t, double* J, int batch_size);
 
 
+/*!----------------------------------------------------------------------------
+ @brif 一括学習用ターミナルアトラクタ
+
+  一括学習におけるターミナルラーニング用の更新関数
+ @param [in] ll_param(LL_PARAM) LL_PARAM構造体のデータ
+ @param [in] layer_out(double***)　各層の出力
+ @param [in] t(double**) 正解データ
+ @param [in] data_num(int) データ数
+ @return double 正解率
+ @attention
+ @par 更新履歴
+   - 2020/4/27
+     -基本的な機能の実装 (by Tsubasa Komiyama)
+
+*/
+double Accuracy(LL_PARAM ll_param, double*** layer_out, double** t, int data_num);
 
 #endif

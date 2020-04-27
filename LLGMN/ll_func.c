@@ -6,6 +6,8 @@
 #include <math.h>
 #pragma warning(disable : 4996)
 
+#define CONFUSION 4     //混合行列のサイズ
+
 
 //評価関数
 double Cost_Function(double *y, double *t, int size)
@@ -118,7 +120,7 @@ void batch_update_w(LL_PARAM ll_param, double epsilon, double **w, double **t, d
     }
     */
 
-    
+
     for (i = 1; i <= h; i++) {    //i : 入力の次元のインデックス
         for (j = 1; j <= k; j++) {    //j : クラスのインデックス
             for (l = 1; l <= m; l++) {    //l : コンポーネントのインデックス
@@ -171,12 +173,12 @@ void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
         //第一項は1
         output_x[n][1] = 1;
 
-        
+
         //第二項～は入力ベクトルx
         for(i = 1; i <= d; i++){
             output_x[n][i+1] = input_x[n][i];
         }
-        
+
 
         //第三項以降
         k = d;  //入力ベクトルXのインデックス
@@ -255,8 +257,8 @@ void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** laye
                         sum_dJ_dw += dJ_dw;
                         sum_J += J[n];
                     }
-                    
-                    
+
+
                     //gammaの計算
                     gamma = pow(sum_J, beta) / pow(sum_dJ_dw, 2.0);
                 }
@@ -266,4 +268,25 @@ void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** laye
             }
         }
     }
+}
+
+
+//正解率の計算
+double Accuracy(LL_PARAM ll_param, double*** layer_out, double** t, int data_num)
+{
+    int i, j;
+    double correct = 0.0;
+    double correct_rate;
+
+    for (i = 0; i < data_num; i++) {
+        for (j = 1; j <= ll_param.output_layer_size; j++) {
+            if (fabs(layer_out[i][2][j] - t[i][j]) <= 0.1) {
+                correct++;
+            }
+        }
+    }
+
+    correct_rate = correct / (data_num * ll_param.output_layer_size);
+
+    return correct_rate;
 }
