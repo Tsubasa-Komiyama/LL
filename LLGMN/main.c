@@ -23,6 +23,7 @@ int main(void){
     double J0;          //評価関数の初期値
     int n_random;                   //入力ベクトルのシャッフルに使用
     double* tmp = NULL;             //入力ベクトルのシャッフルに使用
+    double* tmp_t = NULL;           //正解データのシャッフルに使用
     double correct_rate;            //正解率
 
 
@@ -414,12 +415,17 @@ int main(void){
         //教師データの非線形変換
         Non_linear_tranform(ll_param, train_data, output_x);
 
+        srand((unsigned int)time(NULL));
+
         //教師データをシャッフルする
         for (i = 0; i < DATA_N; i++) {
             n_random = rand() % DATA_N;
             tmp = output_x[i];
+            tmp_t = t[i];
             output_x[i] = output_x[n_random];
+            t[i] = t[n_random];
             output_x[n_random] = tmp;
+            t[n_random] = tmp_t;
         }
 
         /*
@@ -846,6 +852,10 @@ int main(void){
     free(output_x);
     free(ll_param.num_unit);
     free(J);
+    for (i = 0; i <= ll_param.output_layer_size; i++) {
+        free(dis_t[i]);
+    }
+    free(dis_t);
 
 
     return 0;

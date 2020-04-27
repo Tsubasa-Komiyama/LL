@@ -89,7 +89,7 @@ void update_w(LL_PARAM ll_param, double epsilon, double **w, double *t, double *
     for(i = 1; i <= h; i++){    //i : 入力の次元のインデックス
         for(j = 1; j <= k; j++){    //j : クラスのインデックス
             for(l = 1; l <= m; l++){    //l : コンポーネントのインデックス
-                if(((j - 1) * m + l) != (k * m)){
+                if(((j - 1) * m + l) != (k * m + 1)){
                     //微分値の計算
                     dJ_dw = (layer_out[2][j] - t[j]) * layer_out[1][(j-1)*m + l] * layer_out[0][i] / layer_out[2][j];
                 }
