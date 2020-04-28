@@ -164,12 +164,12 @@ LL_PARAM set_param(LL_PARAM ll_param)
 
 
 //入力ベクトルの非線形変換
-void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x)
+void Non_linear_tranform(LL_PARAM ll_param, double **input_x, double **output_x, int data_num)
 {
     int i,j,k, n;  //制御変数
     int d = ll_param.input_layer_size;  //入力ベクトルの次元
 
-    for (n = 0; n < DATA_N; n++) {
+    for (n = 0; n < data_num; n++) {
         //第一項は1
         output_x[n][1] = 1;
 

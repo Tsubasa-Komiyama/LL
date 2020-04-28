@@ -99,6 +99,7 @@ LL_PARAM set_param(LL_PARAM ll_param);
   入力ベクトルxを非線形変換によってLLGMNに適した入力ベクトルXに変換する
  @param [in] input_x(double*) 入力ベクトルx
  @param [out] output_x(double*) 変換後の入力ベクトルX
+ @param [in] data_num(int) データ数
  @return なし
  @attention
  @par 更新履歴
@@ -107,7 +108,7 @@ LL_PARAM set_param(LL_PARAM ll_param);
 
 */
 
-void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x);
+void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x, int data_num);
 
 /*!----------------------------------------------------------------------------
  @brif 逐次学習用ターミナルアトラクタ

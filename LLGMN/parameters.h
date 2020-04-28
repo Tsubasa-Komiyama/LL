@@ -2,7 +2,7 @@
 #ifndef __INC_PARAMETERS_H
 #define __INC_PARAMETERS_H
 
-#define N 10000        //試行回数の最大値
+#define N 1000        //試行回数の最大値
 #define LOSS_MIN 1  //損失の閾値
 #define LL_N 3          //LLGMNの層数
 #define DATA_N 800      //データ数
@@ -23,6 +23,10 @@ double ***layer_out;         //各層の出力
 double **t;                  //正解データ
 double **unlearn_data;      //未学習データ
 double **output_x;          //非線形変換後の入力ベクトル
-double* J;                  //評価関数
+double *J;                  //評価関数
+double **dis_t;               //未学習データの正解データ
+double ***dis_layer_in;       //未学習データの各層の入力
+double ***dis_layer_out;      //未学習データの各層の出力
+double **dis_output_x;               //未学習データの非線形変換後の入力ベクトル
 
 #endif
