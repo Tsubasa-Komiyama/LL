@@ -161,9 +161,10 @@ void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** laye
 
 
 /*!----------------------------------------------------------------------------
- @brif 一括学習用ターミナルアトラクタ
+ @brif 正解率を求める関数
 
-  一括学習におけるターミナルラーニング用の更新関数
+  正解データをもちいて正解率を算出
+  正解率は出力の素子の値と正解の値（0,1)の差が0.1以内である素子の数 / 全素子の数
  @param [in] ll_param(LL_PARAM) LL_PARAM構造体のデータ
  @param [in] layer_out(double***)　各層の出力
  @param [in] t(double**) 正解データ
@@ -176,5 +177,23 @@ void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** laye
 
 */
 double Accuracy(LL_PARAM ll_param, double*** layer_out, double** t, int data_num);
+
+/*!----------------------------------------------------------------------------
+ @brif 識別率を求める関数
+
+  正解データをもちいて識別率を算出
+  識別率は各データの出力で最も確率の高い素子(１～４)が正解データの1の素子と一致している数 / データ数
+ @param [in] ll_param(LL_PARAM) LL_PARAM構造体のデータ
+ @param [in] layer_out(double***)　各層の出力
+ @param [in] t(double**) 正解データ
+ @param [in] data_num(int) データ数
+ @return double 識別率
+ @attention
+ @par 更新履歴
+   - 2020/4/30
+     -基本的な機能の実装 (by Tsubasa Komiyama)
+
+*/
+double Identification(LL_PARAM ll_param, double*** layer_out, double** t, int data_num);
 
 #endif

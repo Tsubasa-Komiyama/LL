@@ -290,3 +290,35 @@ double Accuracy(LL_PARAM ll_param, double*** layer_out, double** t, int data_num
 
     return correct_rate;
 }
+
+
+//Ž¯•Ê—¦
+double Identification(LL_PARAM ll_param, double*** layer_out, double** t, int data_num)
+{
+    int i, j;
+    double identify_rate = 0.0;
+    int max_rate_num;
+    int correct_num;
+
+    for (i = 0; i < data_num; i++) {
+        max_rate_num = 1;
+        correct_num = 1;
+        for (j = 2; j <= ll_param.output_layer_size; j++) {
+            if (layer_out[i][2][max_rate_num] < layer_out[i][2][j]) {
+                max_rate_num = j;
+            }
+
+            if (t[i][j] == 1) {
+                correct_num = j;
+            }
+        }
+
+        if (max_rate_num == correct_num) {
+            identify_rate++;
+        }
+    }
+
+    identify_rate = identify_rate / data_num;
+
+    return identify_rate;
+}

@@ -28,6 +28,7 @@ int main(void){
     double* tmp = NULL;             //入力ベクトルのシャッフルに使用
     double* tmp_t = NULL;           //正解データのシャッフルに使用
     double correct_rate;            //正解率
+    double identify_rate;           //識別率
 
     int train_num;                  //教師データのデータ数
     int dis_num;                    //未学習データのデータ数
@@ -694,7 +695,7 @@ int main(void){
         case 'e':
 
         if (e_count != 0) {
-            printf("**************************************************\n");
+
             printf("[y] 前回の未学習データを使用する\n");
             printf("[n] 新しいの未学習データを使用する\n");
             printf("**************************************************\n");
@@ -873,6 +874,11 @@ int main(void){
         printf("正解率は：");
         correct_rate = Accuracy(ll_param, dis_layer_out, dis_t, dis_num);
         printf("%lf\n", correct_rate);
+        printf("\n");
+
+        printf("識別率は：");
+        identify_rate = Identification(ll_param, dis_layer_out, dis_t, dis_num);
+        printf("%lf\n", identify_rate);
 
         e_count++;
 
