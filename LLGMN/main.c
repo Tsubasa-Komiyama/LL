@@ -64,8 +64,9 @@ int main(void){
 
     double **train_data = NULL;     //入力データ
     double **w = NULL;              //重み
-    double ***layer_in = NULL;       //各層の入力
-    double ***layer_out = NULL;      //各層の出力
+    double** pre_dJ_dw = NULL;      //一週前の重みの更新値（TA）
+    double ***layer_in = NULL;      //各層の入力
+    double ***layer_out = NULL;     //各層の出力
     double **t = NULL;              //正解データ
     double **unlearn_data;          //未学習データ
     double **output_x = NULL;       //非線形変換後の入力ベクトル
@@ -129,6 +130,21 @@ int main(void){
     printf("\n");
 
     fclose(fp);
+
+    //pre_dJ_dw
+    if ((pre_dJ_dw = (double**)malloc((ll_param.num_unit[0] + 1) * sizeof(double*))) == NULL) {
+        exit(-1);
+    }
+
+    for (i = 0; i <= ll_param.num_unit[0]; i++) {
+        if ((pre_dJ_dw[i] = (double*)malloc((ll_param.num_unit[1] + 1) * sizeof(double))) == NULL) {
+            exit(-1);
+        }
+
+        for (j = 0; j <= ll_param.num_unit[1]; j++) {
+            pre_dJ_dw[i][j] = 0.0;
+        }
+    }
 
     //layer_out
     if((layer_out = (double***)malloc((train_num + 1) * sizeof(double**))) == NULL) {
@@ -515,6 +531,13 @@ int main(void){
             //教師データの非線形変換
             Non_linear_tranform(ll_param, train_data, output_x, train_num);
 
+            //pre_dJ_dwの初期化
+            for (i = 0; i <= ll_param.num_unit[0]; i++) {
+                for (j = 0; j <= ll_param.num_unit[1]; j++) {
+                    pre_dJ_dw[i][j] = 0.0;
+                }
+            }
+
             printf("TAを用いた一括学習の処理を始めます．\n");
             //損失を格納するファイルを開く
             fp = fopen("loss_batch.csv", "w");
@@ -544,7 +567,7 @@ int main(void){
                 }
 
                 //重みの更新
-                TA_batch_update_w(ll_param, w, t, layer_out, J0, beta, tf, sampling_time, J, train_num);
+                TA_batch_update_w(ll_param, w, t, layer_out, J0, beta, tf, sampling_time, Loss_batch, train_num, pre_dJ_dw);
 
                 //カウント
                 batch_count++;
@@ -615,6 +638,13 @@ int main(void){
                 output_x[n_random] = tmp;
             }
 
+            //pre_dJ_dwの初期化
+            for (i = 0; i <= ll_param.num_unit[0]; i++) {
+                for (j = 0; j <= ll_param.num_unit[1]; j++) {
+                    pre_dJ_dw[i][j] = 0.0;
+                }
+            }
+
             printf("TAの逐次学習の処理を始めます．\n");
             //損失関数を出力するファイルを開く
             fp = fopen("loss_seq.csv", "w");
@@ -637,19 +667,19 @@ int main(void){
                         J0 = J[i];
                     }
 
-                    /*
+                    
                     if (i % 10 == 0) {
                         printf("i = %d : %lf\n", i, Loss_seq);
                     }
-                    */
+                    
 
                     //重みの更新
-                    TA_update_w(ll_param, w, t[i], layer_out[i], J0, beta, tf, J[i], sampling_time);
+                    TA_update_w(ll_param, w, t[i], layer_out[i], J0, beta, tf, J[i], sampling_time, pre_dJ_dw);
                 }
                 //カウント
                 seq_count++;
 
-                if (seq_count % 100 == 0) {
+                if (seq_count % 1 == 0) {
                     printf("seq_count = %d : %lf\n", seq_count, Loss_seq);
                 }
 

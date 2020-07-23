@@ -132,7 +132,7 @@ void Non_linear_tranform(LL_PARAM ll_param, double** input_x, double** output_x,
 
 */
 
-void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J, double delta_t);
+void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, double J0, double beta, int tf, double J, double delta_t, double** pre_dJ_dw);
 
 /*!----------------------------------------------------------------------------
  @brif 一括学習用ターミナルアトラクタ
@@ -147,7 +147,7 @@ void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, d
  @param [in] beta(double) ０～１の定数
  @param [in] tf(int) 収束時間
  @param [in] delta_t(double) サンプリング時間
- @param [in] J(double*) 各層の出力を格納してある配列
+ @param [in] J(double) 各層の出力を格納してある配列
  @param [in] batch_size(int) データ数
  @return なし
  @attention
@@ -157,7 +157,7 @@ void TA_update_w(LL_PARAM ll_param, double** w, double* t, double** layer_out, d
 
 */
 
-void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double delta_t, double* J, int batch_size);
+void TA_batch_update_w(LL_PARAM ll_param, double** w, double** t, double*** layer_out, double J0, double beta, int tf, double delta_t, double J, int batch_size, double** pre_dJ_dw);
 
 
 /*!----------------------------------------------------------------------------
